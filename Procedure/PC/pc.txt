@@ -1,0 +1,13 @@
+# MACアドレスを設定してから起動
+# bt_client.py の RPI_BT_MAC を実際のラズパイMACに変更すること
+
+python3 main_pc.py
+
+# 起動後の動作:
+#  1. BT接続を1秒ごとに試行（最大10回）
+#  2. 接続成功 → ラズパイIPのポップアップが出現
+#  3. 監視開始 → RTT低下時に右側警告ポップアップ出現
+#  4. コマンド入力プロンプトが出現
+#     >>> LED_ON
+#     >>> MSG:Hello Raspberry Pi
+#     >>> exit
