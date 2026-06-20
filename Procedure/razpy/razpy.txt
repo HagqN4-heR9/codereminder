@@ -1,0 +1,9 @@
+# ① C++コマンド受信プログラムをビルド
+mkdir build && cd build && cmake .. && make
+cd ..
+
+# ② BT発信サーバー起動
+python3 bt_server.py &
+
+# ③ C++コマンド受信を起動
+./build/cmd_receiver
