@@ -1,27 +1,24 @@
-    _connected = True
-    print(f"[PAN] 接続完了 ラズパイIP={RPI_PAN_IP}")
-    if on_connected:
-        on_connected(RPI_PAN_IP)
-    return True
+# monitor.py  (Ubuntu PC)
+"""
+1秒ごとにラズパイへpingを送りRTTを計測。
+4段階レベルに変換し、変化時にコールバックを通知する。
+"""
+import subprocess, threading, time, re
 
-def start_auto_connect(on_connected=None):
-    """
-    バックグラウンドで接続監視ループを起動。
-    1秒ごとにリトライし10回でBTスリープ。
-    """
-    def _loop():
-        global _retry_count, _connected
-        while not _connected:
-            print(f"[BT] 接続試行 {_retry_count+1}/{RETRY_MAX}")
-            if connect_pan(on_connected):
-                return
-            _retry_count += 1
-            if _retry_count >= RETRY_MAX:
-                _bt_sleep()
-                return
-            time.sleep(1)
-    t = threading.Thread(target=_loop, daemon=True)
-    t.start()
+RPI_IP = "192.168.44.2"
+
+# RTT → レベル変換テーブル
+def rtt_to_level(rtt_ms: float) -> int:
+    if rtt_ms <   0:  return 0  # タイムアウト
+    if rtt_ms <=  50: return 4  # 良好
+    if rtt_ms <= 150: return 3  # 普通
+    if rtt_ms <= 300: return 2  # 不安定（警告閾値）
+    if rtt_ms <= 500: return 1  # 危険
+    return 0                    # 圏外
+
+def _ping_once(host: str) -> float:
+    """pingを1回実行しRTT(ms)を返す。失敗時は-1.0"""
+    try:
         res = subprocess.run(
             ["ping", "-c", "1", "-W", "1", host],
             capture_output=True, text=True, timeout=2

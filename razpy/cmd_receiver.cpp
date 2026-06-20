@@ -1,4 +1,4 @@
-// cmd_receiver.cpp  (Raspberry Pi)
+//cmd_receiver.cpp  (Raspberry Pi)
 // PC側からの入力コマンドを受信し、std::stringとしてパースして実行する
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -35,7 +35,7 @@ void handle_command(const std::string& cmd) {
     else { std::cout << "[CMD] 不明: " << cmd << std::endl; }
 }
 
-int main() {
+int main(){
     int srv = socket(AF_INET, SOCK_STREAM, 0);
     int opt = 1;
     setsockopt(srv, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
@@ -55,7 +55,7 @@ int main() {
     std::cout << "[CMD_SERVER] PC接続完了\n";
 
     while (true) {
-        // ① 4バイトのサイズヘッダを受信
+       // ① 4バイトのサイズヘッダを受信
         uint32_t net_size = 0;
         if (!recv_exact(conn, reinterpret_cast<uint8_t*>(&net_size), 4)) break;
         uint32_t size = ntohl(net_size);   // ネットワーク→ホストバイトオーダー
